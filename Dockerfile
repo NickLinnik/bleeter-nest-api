@@ -1,13 +1,11 @@
-FROM node:16
+FROM node:lts
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm i sequelize-cli -g
-
 RUN npm i
 
 COPY ./ ./
 
-CMD ["npm", "run", "start:dev"]
+CMD npm run start:dev
