@@ -9,3 +9,9 @@ export class UserByLoginNotFoundError extends UserNotFoundError {
         super('User with such login not found');
     }
 }
+
+export class UniqueLoginViolationError extends Error {
+    constructor(response: string | undefined = 'login must be unique') {
+        super(response);
+    }
+}

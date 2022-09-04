@@ -6,7 +6,8 @@ import { promisify } from 'util';
 import { hash } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { UpdateUserDto } from '~modules/users/dto/update-user.dto';
-import { UserByLoginNotFoundError } from '~modules/users/users.errors/users.app-erros';
+import { UserLoginDto } from '~modules/users/dto/user-login.dto';
+import { ReturnUserDto } from '~modules/users/dto/return-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -22,36 +23,32 @@ export class UsersService {
     );
   }
 
-  async findOne(login: string): Promise<UserModel | null> {
-    // TODO exclude password
-    return await this.usersRepository.findOne(login);
+  async findOne(login: UserLoginDto): Promise<ReturnUserDto | null> {
+    const userModel = await this.usersRepository.findOne(login);
+    return userModel? new ReturnUserDto(userModel.toJSON()) : null
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserModel> {
+  async create(createUserDto: CreateUserDto): Promise<ReturnUserDto> {
     const { password, ...otherValues } = createUserDto;
-    console.log(password)
-    console.log(createUserDto)
-    return await this.usersRepository.create({
+    const userModel = await this.usersRepository.create({
       ...otherValues,
       password: await this.hashPassword(password),
     });
+    return new ReturnUserDto(userModel.toJSON())
   }
 
   async update(
-    login: string,
+    login: UserLoginDto,
     updateUserDto: UpdateUserDto,
-  ): Promise<UserModel> {
-    const user = await this.findOne(login);
-    if (!user) throw new UserByLoginNotFoundError();
-
+  ): Promise<ReturnUserDto> {
     const newUpdateUserDto = Object.assign({}, updateUserDto);
     if (newUpdateUserDto.password) {
       newUpdateUserDto.password = await this.hashPassword(
         newUpdateUserDto.password,
       );
     }
-
-    return await this.usersRepository.update(user, newUpdateUserDto);
+    const userModel = await this.usersRepository.update(login, newUpdateUserDto);
+    return new ReturnUserDto(userModel.toJSON())
   }
 
   private async hashPassword(password: string): Promise<string> {

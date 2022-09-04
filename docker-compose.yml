@@ -1,9 +1,15 @@
 version: "3"
 
+
+volumes:
+  DB-tweetter-postgres:
+
 services:
   postgres:
     image: postgres:latest
     container_name: postgres
+    volumes:
+      - DB-tweetter-postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     env_file: .env
