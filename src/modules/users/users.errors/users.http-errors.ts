@@ -1,4 +1,4 @@
-import {BadGatewayException, BadRequestException, HttpStatus, NotFoundException} from '@nestjs/common';
+import {BadRequestException, NotFoundException} from '@nestjs/common';
 
 export class UserNotFoundHttpException extends NotFoundException {
     constructor(response: string | Record<string, any> = 'User not found') {

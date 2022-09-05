@@ -1,17 +1,17 @@
 import {
-  Body, ClassSerializerInterceptor,
+  Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   Param,
   Post,
   Put,
-  Query, UseInterceptors,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from '~modules/users/users.service';
 import { CreateUserDto } from '~modules/users/dto/create-user.dto';
-import { UserModel } from '~modules/users/users.model';
 import { UpdateUserDto } from '~modules/users/dto/update-user.dto';
 import {
   UniqueLoginViolationHttpException,
@@ -21,8 +21,8 @@ import {
   UniqueLoginViolationError,
   UserByLoginNotFoundError,
 } from '~modules/users/users.errors/users.app-erros';
-import { UserLoginDto } from '~modules/users/dto/user-login.dto';
-import {ReturnUserDto} from "~modules/users/dto/return-user.dto";
+import { UserLoginDto } from '~modules/users/dto/user-fields.dto';
+import { ReturnUserDto } from '~modules/users/dto/return-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -32,9 +32,9 @@ export class UsersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UsePipes(new ValidationPipe({ transform: true }))
   async getUser(@Param() userLoginDto: UserLoginDto): Promise<ReturnUserDto> {
-    const user = await this.usersService.findOne(userLoginDto);
+    const user = await this.usersService.findOne(userLoginDto.login);
     if (!user) throw new UserByLoginNotFoundHttpException();
-    console.log(user)
+    console.log(user);
     return user;
   }
 
@@ -44,9 +44,7 @@ export class UsersController {
   async registerUser(
     @Body() createUserDto: CreateUserDto,
   ): Promise<ReturnUserDto> {
-    return await this.usersService
-        .create(createUserDto)
-        .catch((error) => {
+    return await this.usersService.create(createUserDto).catch((error) => {
       if (error instanceof UniqueLoginViolationError) {
         throw new UniqueLoginViolationHttpException();
       } else throw new Error();
@@ -57,11 +55,11 @@ export class UsersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UsePipes(new ValidationPipe({ transform: true }))
   async updateUser(
-    @Param() login: UserLoginDto,
+    @Param() userLoginDto: UserLoginDto,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<ReturnUserDto> {
     return await this.usersService
-      .update(login, updateUserDto)
+      .update(userLoginDto.login, updateUserDto)
       .catch((error) => {
         if (error instanceof UserByLoginNotFoundError) {
           throw new UserByLoginNotFoundHttpException();
