@@ -1,15 +1,15 @@
 import { Exclude } from 'class-transformer';
 import {
   IsBoolean,
+  IsDate,
   IsEnum,
   IsOptional,
   MaxLength,
   MinLength,
-  IsDate,
 } from 'class-validator';
 import { Gender } from '~modules/users/gender.enum';
 
-export class ReturnUserDto {
+export class UserEntity {
   @MinLength(4)
   @MaxLength(15)
   login!: string;
@@ -25,10 +25,10 @@ export class ReturnUserDto {
   userName?: string;
 
   @IsEnum(Gender)
-  gender!: Gender;
+  gender: Gender = Gender.Unspecified;
 
   @IsBoolean()
-  admin!: boolean;
+  admin: boolean = false;
 
   @IsDate()
   createdAt!: Date;
@@ -36,7 +36,7 @@ export class ReturnUserDto {
   @IsDate()
   updatedAt!: Date;
 
-  constructor(partial: Partial<ReturnUserDto>) {
+  constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);
   }
 }

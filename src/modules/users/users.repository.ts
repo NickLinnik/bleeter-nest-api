@@ -2,13 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import { UserModel } from '~modules/users/users.model';
-import { CreateUserDto } from '~modules/users/dto/create-user.dto';
-import { UpdateUserDto } from '~modules/users/dto/update-user.dto';
-import { UserLoginDto } from '~modules/users/dto/user-fields.dto';
 import {
   UniqueLoginViolationError,
   UserByLoginNotFoundError,
 } from '~modules/users/users.errors/users.app-erros';
+import { CreateUserDto } from '~modules/users/dto/create-user.dto';
+import { UpdateUserDto } from '~modules/users/dto/update-user.dto';
 
 @Injectable()
 export class UsersRepository {

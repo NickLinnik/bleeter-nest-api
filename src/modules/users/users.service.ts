@@ -5,8 +5,7 @@ import { promisify } from 'util';
 import { hash } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { UpdateUserDto } from '~modules/users/dto/update-user.dto';
-import { UserLoginDto } from '~modules/users/dto/user-fields.dto';
-import { ReturnUserDto } from '~modules/users/dto/return-user.dto';
+import { UserEntity } from '~modules/users/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -22,24 +21,26 @@ export class UsersService {
     );
   }
 
-  async findOne(login: string): Promise<ReturnUserDto | null> {
+  async findOne(login: string): Promise<UserEntity | null> {
     const userModel = await this.usersRepository.findOne(login);
-    return userModel? new ReturnUserDto(userModel.toJSON()) : null
+    return userModel? new UserEntity(userModel.toJSON()) : null
   }
 
-  async create(createUserDto: CreateUserDto): Promise<ReturnUserDto> {
+  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const { password, ...otherValues } = createUserDto;
     const userModel = await this.usersRepository.create({
       ...otherValues,
       password: await this.hashPassword(password),
     });
-    return new ReturnUserDto(userModel.toJSON())
+    return new UserEntity(userModel.toJSON())
   }
 
   async update(
     login: string,
     updateUserDto: UpdateUserDto,
-  ): Promise<ReturnUserDto> {
+  ): Promise<UserEntity> {
+    console.log('login:', login)
+    console.log('updateUserDto:', updateUserDto)
     const newUpdateUserDto = Object.assign({}, updateUserDto);
     if (newUpdateUserDto.password) {
       newUpdateUserDto.password = await this.hashPassword(
@@ -47,7 +48,7 @@ export class UsersService {
       );
     }
     const userModel = await this.usersRepository.update(login, newUpdateUserDto);
-    return new ReturnUserDto(userModel.toJSON())
+    return new UserEntity(userModel.toJSON())
   }
 
   private async hashPassword(password: string): Promise<string> {

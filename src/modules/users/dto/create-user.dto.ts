@@ -24,8 +24,4 @@ export class CreateUserDto {
   @IsOptional()
   @IsEnum(Gender)
   gender?: Gender;
-
-  @IsOptional()
-  @IsBoolean()
-  admin?: boolean;
 }
